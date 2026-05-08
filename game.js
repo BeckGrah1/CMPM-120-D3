@@ -13,11 +13,11 @@ let config = {
         default: 'matter',
         matter: {
             gravity: { y: 1 },
-            debug: true
+            debug: false
         }
     },
     parent: "root",
-    scene: [tutorial, score, level2],
+    scene: [level2, tutorial, score],
     render: {
         pixelArt: true,
         antialias: false
