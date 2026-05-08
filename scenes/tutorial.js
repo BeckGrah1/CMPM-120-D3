@@ -14,6 +14,7 @@ export default class tutorial extends Phaser.Scene {
     create() {
         this.dominoCount = 5;
         this.dominoes = [];
+        this.ground = [];
         this.knockdownStarted = false;
         this.cheated = false;
         this.won = false;
@@ -31,6 +32,7 @@ export default class tutorial extends Phaser.Scene {
             )
             .setScale(10)
             .setStatic(true);
+            this.ground.push(tile);
         }
 
         const startTexture = this.textures.get("startDomino").getSourceImage();
@@ -82,7 +84,7 @@ export default class tutorial extends Phaser.Scene {
         this.dominoes.push(this.endDomino);
 
         this.input.on('pointerdown', (pointer) => {
-            if (this.dominoCount > 0) {
+            if (this.dominoCount > 0 && (!this.knockdownStarted || this.cheated)) {
                 const dominoTexture = this.textures.get("domino");
                 const dominoWidth = dominoTexture.getSourceImage().width * 10;
                 const dominoHeight = dominoTexture.getSourceImage().height * 10;
@@ -96,8 +98,19 @@ export default class tutorial extends Phaser.Scene {
                         canPlaceDomino = false;
                     }
                 });
+                this.ground.forEach((tile) => {
+                    if (Phaser.Geom.Intersects.RectangleToRectangle(
+                        new Phaser.Geom.Rectangle(pointer.worldX, pointer.worldY, dominoWidth, dominoHeight),
+                        tile.getBounds()
+                    )) {
+                        canPlaceDomino = false;
+                    }
+                });
 
-                if (!canPlaceDomino) return;
+                if (!canPlaceDomino) {
+                    this.cameras.main.shake(100, 0.005);
+                    return;
+                };
 
                 this.dominoCount--;
                 let domino = this.matter.add.image(pointer.worldX + dominoWidth / 2, pointer.worldY + dominoHeight / 2, "domino")
@@ -127,62 +140,5 @@ export default class tutorial extends Phaser.Scene {
             this.knockdownStarted = true;
         });
         
-    }
-
-    update() {
-        if (this.endDomino.angle > 20 || this.endDomino.angle < -20) {
-            if (this.knockdownStarted && !this.won) {
-                const elapsed = this.time.now - this.startTime;
-                const seconds = (elapsed / 1000).toFixed(2);
-                this.won = true;
-                let winText = this.add.text(this.scale.width / 2, this.scale.height / 2, "Congratulations! You knocked down the end domino!", {
-                    fontFamily: "Pixelify Sans",
-                    fontSize: "32px",
-                    color: "#00ff00",
-                    wordWrap: {
-                        width: 600,
-                        useAdvancedWrap: true
-                    },
-                    align: "center"
-                }).setOrigin(0.5).setScale(0);
-                this.tweens.add({
-                    targets: winText,
-                    scale: 2,
-                    duration: 500,
-                    ease: "Sine.easeInOut",
-                    onComplete: () => {
-                        this.cameras.main.fadeOut(1000, 0, 0, 0);
-                        this.time.delayedCall(2000, () => {
-                            this.scene.start("score", { time: seconds, dominosUsed: this.dominoes.length - 2, nextLevel: "level2" });
-                        });
-                    }
-                })
-            }
-            else if (!this.cheated && !this.knockdownStarted) {
-                this.cheated = true;
-                let cheatText = this.add.text(this.scale.width / 2, this.scale.height / 2, "Hey! You knocked down the end domino without clicking the start domino!", {
-                    fontFamily: "Pixelify Sans",
-                    fontSize: "32px",
-                    color: "#ff0000",
-                    wordWrap: {
-                        width: 600,
-                        useAdvancedWrap: true
-                    },
-                    align: "center"
-                }).setOrigin(0.5).setScale(0);
-
-                this.tweens.add({
-                    targets: cheatText,
-                    scale: 2,
-                    duration: 500,
-                    ease: "Sine.easeInOut",
-                    onComplete: () => {
-                        this.time.delayedCall(2000, () => {
-                            this.scene.restart();
-                        });
-                    }
-                });
-            }
-        }
     }
 }
