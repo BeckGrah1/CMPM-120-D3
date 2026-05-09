@@ -9,9 +9,12 @@ export default class tutorial extends Phaser.Scene {
         this.load.image("startDomino", "assets/start_domino.png");
         this.load.image("endDomino", "assets/end_domino.png");
         this.load.image("arrow", "assets/arrow_small.png");
+        this.load.image("button", "assets/button.png");
     }
 
     create() {
+        this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor("#687967");
+
         this.dominoCount = 5;
         this.dominoes = [];
         this.ground = [];
@@ -25,7 +28,7 @@ export default class tutorial extends Phaser.Scene {
         let groundTileCount = this.scale.width / (groundWidth * 10);
 
         for (let i = 0; i < groundTileCount; i++) {
-            this.matter.add.image(
+            let tile = this.matter.add.image(
                 i * groundWidth * 10 + (groundWidth * 10) / 2,
                 this.scale.height - (groundHeight * 10) / 2,
                 "ground"
@@ -78,6 +81,8 @@ export default class tutorial extends Phaser.Scene {
             ease: "Sine.easeInOut"
         });
 
+        this.makeUI();
+
         this.endDomino = this.matter.add.image(this.scale.width - 100, this.scale.height - 500, "endDomino")
             .setScale(10);
         this.endDomino.setMass(0.1);
@@ -119,6 +124,7 @@ export default class tutorial extends Phaser.Scene {
                     .setBounce(0.05);
                 domino.setMass(0.1);
                 this.dominoes.push(domino);
+                this.dominoCountText.setText(`Dominoes left: ${this.dominoCount}`);
             }
         });
 
@@ -140,5 +146,128 @@ export default class tutorial extends Phaser.Scene {
             this.knockdownStarted = true;
         });
         
+    }
+
+    update() {
+        if (this.endDomino.angle > 20 || this.endDomino.angle < -20) {
+            if (this.knockdownStarted && !this.won) {
+                const elapsed = this.time.now - this.startTime;
+                const seconds = (elapsed / 1000).toFixed(2);
+                this.won = true;
+                this.timeText.setText(`Time: ${seconds}s`);
+                let winText = this.add.text(this.scale.width / 2, this.scale.height / 2, "Congratulations! You knocked down the end domino!", {
+                    fontFamily: "Pixelify Sans",
+                    fontSize: "32px",
+                    color: "#00ff00",
+                    wordWrap: {
+                        width: 600,
+                        useAdvancedWrap: true
+                    },
+                    align: "center"
+                }).setOrigin(0.5).setScale(0);
+                this.tweens.add({
+                    targets: winText,
+                    scale: 2,
+                    duration: 500,
+                    ease: "Sine.easeInOut",
+                    onComplete: () => {
+                        this.time.delayedCall(2000, () => {
+                            this.cameras.main.fadeOut(1000, 0, 0, 0);
+                            this.time.delayedCall(1000, () => {
+                                this.scene.start("score", { time: seconds, dominosUsed: this.dominoes.length - 2, nextLevel: "level2" });
+                            });
+                        });
+                    }
+                })
+            }
+            else if (!this.cheated && !this.knockdownStarted) {
+                this.cheated = true;
+                let cheatText = this.add.text(this.scale.width / 2, this.scale.height / 2, "Hey! You knocked down the end domino without clicking the start domino!", {
+                    fontFamily: "Pixelify Sans",
+                    fontSize: "32px",
+                    color: "#ff0000",
+                    wordWrap: {
+                        width: 600,
+                        useAdvancedWrap: true
+                    },
+                    align: "center"
+                }).setOrigin(0.5).setScale(0);
+
+                this.tweens.add({
+                    targets: cheatText,
+                    scale: 2,
+                    duration: 500,
+                    ease: "Sine.easeInOut",
+                    onComplete: () => {
+                        this.time.delayedCall(2000, () => {
+                            this.scene.restart();
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    makeUI() {
+        let restartButton = this.add.image(this.scale.width - 150, this.scale.height - 50, "button").setOrigin(0.5).setInteractive().setScale(2);
+        let restartText = this.add.text(this.scale.width - 150, this.scale.height - 50, "Restart", {
+            fontFamily: "Pixelify Sans",
+            fontSize: "40px",
+            color: "#ffffff",
+        }).setOrigin(0.5);
+
+        restartButton.on('pointerover', () => {
+            this.tweens.add({
+                targets: restartButton,
+                scale: 2.2,
+                duration: 200,
+                ease: "Sine.easeInOut",
+            });
+        });
+
+        restartButton.on('pointerout', () => {
+            this.tweens.add({
+                targets: restartButton,
+                scale: 2,
+                duration: 200,
+                ease: "Sine.easeInOut",
+            });
+        });
+
+        restartButton.on('pointerdown', () => {
+            this.tweens.add({
+                targets: [restartButton],
+                scale: 1.8,
+                duration: 200,
+                ease: "Sine.easeInOut",
+                onComplete: () => {
+                    this.scene.restart();
+                }
+             });
+        });
+
+        this.dominoCountText = this.add.text(this.scale.width - 500, 50, `Dominoes left: ${this.dominoCount}`, {
+            fontSize: "48px",
+            color: "#ffffff",
+            align: "center"
+        }).setOrigin(0);
+
+        this.timeText = this.add.text(this.scale.width - 500, 120, `Time: 0.00s`, {
+            fontSize: "48px",
+            color: "#ffffff",
+            align: "center"
+         }).setOrigin(0);
+
+        this.time.addEvent({
+            delay: 100,
+            loop: true,
+            callback: () => {
+                if (this.knockdownStarted && !this.won) {
+                    const elapsed = this.time.now - this.startTime;
+                    const seconds = (elapsed / 1000).toFixed(2);
+                    this.timeText.setText(`Time: ${seconds}s`);
+                }
+            }
+        });
     }
 }

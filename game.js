@@ -1,6 +1,8 @@
 import tutorial from '/scenes/tutorial.js';
 import score from '/scenes/score.js';
 import level2 from '/scenes/level2.js';
+import level3 from '/scenes/level3.js';
+import startScene from '/scenes/startScene.js';
 
 let config = {
     scale: {
@@ -17,11 +19,12 @@ let config = {
         }
     },
     parent: "root",
-    scene: [level2, tutorial, score],
+    scene: [startScene, level3, level2, tutorial, score],
     render: {
         pixelArt: true,
         antialias: false
     },
+    backgroundColor: Phaser.Display.Color.HexStringToColor("#577754"),
     title: "Dominoes",
 };
 

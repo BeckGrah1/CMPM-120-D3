@@ -14,9 +14,10 @@ export default class score extends Phaser.Scene {
     }
 
     create() {
-        let congratulationsText = this.add.text(this.scale.width / 2, 200, "Congratulations! You completed the level!", {
+        
+        let congratulationsText = this.add.text(this.scale.width / 2, 200, "You completed the level!", {
             fontFamily: "Pixelify Sans",
-            fontSize: "32px",
+            fontSize: "80px",
             color: "#ffffff",
             wordWrap: {
                 width: 600,
@@ -26,7 +27,6 @@ export default class score extends Phaser.Scene {
         }).setOrigin(0.5).setScale(0);
 
         let statsText = this.add.text(this.scale.width / 2, this.scale.height / 2 - 50, `Time: ${this.time} seconds\nDominos Used: ${this.dominosUsed}`, {
-            fontFamily: "Pixelify Sans",
             fontSize: "24px",
             color: "#ffffff",
             wordWrap: {
@@ -37,14 +37,24 @@ export default class score extends Phaser.Scene {
         }).setOrigin(0.5).setScale(0);
 
         let button = this.add.image(this.scale.width / 2, this.scale.height / 2 + 100, "button").setOrigin(0.5).setScale(0).setInteractive();
-        let buttonText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 100, "Next Level", {
-            fontFamily: "Pixelify Sans",
-            fontSize: "24px",
-            color: "#ffffff",
-        }).setOrigin(0.5).setScale(0);
+        let buttonText = null;
+        if (this.nextLevel != "startScene") {
+            buttonText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 100, "Next Level", {
+                fontFamily: "Pixelify Sans",
+                fontSize: "24px",
+                color: "#ffffff",
+            }).setOrigin(0.5).setScale(0);  
+        }
+        else {
+            buttonText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 100, "Main Menu", {
+                fontFamily: "Pixelify Sans",
+                fontSize: "24px",
+                color: "#ffffff",
+            }).setOrigin(0.5).setScale(0);
+        }
 
         this.tweens.add({
-            targets: this.children.getAll(),
+            targets: [congratulationsText, statsText, buttonText],
             scale: 2,
             duration: 500,
             ease: "Sine.easeInOut"
@@ -54,7 +64,24 @@ export default class score extends Phaser.Scene {
             scale: 3,
             duration: 500,
             ease: "Sine.easeInOut",
-            delay: 500
+        });
+
+        button.on("pointerover", () => {
+            this.tweens.add({
+                targets: button,
+                scale: 3.2,
+                duration: 200,
+                ease: "Sine.easeInOut"
+            });
+        });
+
+        button.on("pointerout", () => {
+            this.tweens.add({
+                targets: button,
+                scale: 3,
+                duration: 200,
+                ease: "Sine.easeInOut"
+             });
         });
         
 
@@ -65,7 +92,12 @@ export default class score extends Phaser.Scene {
                 duration: 500,
                 ease: "Sine.easeInOut",
                 onComplete: () => {
-                    this.scene.start(this.nextLevel);
+                    if (this.nextLevel === "startScene") {
+                        window.location.reload();
+                    }
+                    else {
+                        this.scene.start(this.nextLevel);
+                    }
                 }
             });
         });

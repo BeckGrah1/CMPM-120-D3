@@ -1,6 +1,6 @@
-export default class level2 extends Phaser.Scene {
+export default class level3 extends Phaser.Scene {
     constructor() {
-        super("level2");
+        super("level3");
     }
 
     preload() {
@@ -14,7 +14,9 @@ export default class level2 extends Phaser.Scene {
     }
 
     create() {
-        this.dominoCount = 5;
+        this.cameras.main.setZoom(0.55);
+        this.cameras.main.setScroll(0, -440);
+        this.dominoCount = 11;
         this.dominoes = [];
         this.ground = [];
         this.knockdownStarted = false;
@@ -36,14 +38,16 @@ export default class level2 extends Phaser.Scene {
             .setStatic(true);
             this.ground.push(tile);
         }
-        for (let j = 0; j < 3; j++) {
-            for (let i = 0; i < (10 - 4 * j); i++) {
-                let tile = this.matter.add.image(1920 - (j * 2 * groundWidth * 10) - (i * groundWidth * 10) - (groundWidth * 5), this.scale.height - (groundHeight * 5) - (groundHeight * 10) - (150 * j), "stone")
-                    .setScale(10)
-                    .setStatic(true);
-                this.ground.push(tile);
-            }
+        for (let i = 0; i < 10; i++) {
+            let tile = this.matter.add.image(groundWidth * 5 + (groundWidth * 10 * i), 210, "stone")
+                .setScale(10)
+                .setStatic(true);
+            this.ground.push(tile);
         }
+        let tile = this.matter.add.image(groundWidth * 5 + (groundWidth * 100) + (groundWidth * 5), 210, "stone")
+                .setScale(10)
+                .setStatic(true);
+            this.ground.push(tile);
 
         this.placeStartDominos();
 
@@ -80,7 +84,7 @@ export default class level2 extends Phaser.Scene {
                 let domino = this.matter.add.image(pointer.worldX + dominoWidth / 2, pointer.worldY + dominoHeight / 2, "domino")
                     .setScale(10)
                     .setFrictionAir(0.01)
-                    .setBounce(0.05);
+                    .setBounce(0.05)
                 domino.setMass(0.1);
                 this.dominoes.push(domino);
                 this.dominoCountText.setText(`Dominoes left: ${this.dominoCount}`);
@@ -134,7 +138,7 @@ export default class level2 extends Phaser.Scene {
 
         this.makeUI();
 
-        this.endDomino = this.matter.add.image(this.scale.width - 80, 100, "endDomino")
+        this.endDomino = this.matter.add.image(100, -100, "endDomino")
             .setScale(10);
         this.endDomino.setMass(0.1);
         this.dominoes.push(this.endDomino);
@@ -165,9 +169,9 @@ export default class level2 extends Phaser.Scene {
                 const seconds = (elapsed / 1000).toFixed(2);
                 this.won = true;
                 this.timeText.setText(`Time: ${seconds}s`);
-                let winText = this.add.text(this.scale.width / 2, this.scale.height / 2, "Congratulations! You knocked down the end domino!", {
+                let winText = this.add.text(this.scale.width / 2, -500, "Congratulations! You knocked down the end domino!", {
                     fontFamily: "Pixelify Sans",
-                    fontSize: "32px",
+                    fontSize: "64px",
                     color: "#00ff00",
                     wordWrap: {
                         width: 600,
@@ -184,7 +188,7 @@ export default class level2 extends Phaser.Scene {
                         this.time.delayedCall(3000, () => {
                             this.cameras.main.fadeOut(1000, 0, 0, 0);
                             this.time.delayedCall(1000, () => {
-                                this.scene.start("score", { time: seconds, dominosUsed: this.dominoes.length - 2, nextLevel: "level3" });
+                                this.scene.start("score", { time: seconds, dominosUsed: this.dominoes.length - 2, nextLevel: "startScene" });
                             });
                         });
                     }
@@ -219,17 +223,17 @@ export default class level2 extends Phaser.Scene {
     }
 
     makeUI() {
-        let restartButton = this.add.image(this.scale.width - 150, this.scale.height - 50, "button").setOrigin(0.5).setInteractive().setScale(2);
-        let restartText = this.add.text(this.scale.width - 150, this.scale.height - 50, "Restart", {
+        let restartButton = this.add.image(this.scale.width + 500, this.scale.height - 80, "button").setOrigin(0.5).setInteractive().setScale(3.6);
+        let restartText = this.add.text(this.scale.width + 500, this.scale.height - 80, "Restart", {
             fontFamily: "Pixelify Sans",
-            fontSize: "40px",
+            fontSize: "73px",
             color: "#ffffff",
         }).setOrigin(0.5);
 
         restartButton.on('pointerover', () => {
             this.tweens.add({
                 targets: restartButton,
-                scale: 2.2,
+                scale: 3.96,
                 duration: 200,
                 ease: "Sine.easeInOut",
             });
@@ -238,7 +242,7 @@ export default class level2 extends Phaser.Scene {
         restartButton.on('pointerout', () => {
             this.tweens.add({
                 targets: restartButton,
-                scale: 2,
+                scale: 3.6,
                 duration: 200,
                 ease: "Sine.easeInOut",
             });
@@ -256,14 +260,14 @@ export default class level2 extends Phaser.Scene {
              });
         });
 
-        this.dominoCountText = this.add.text(this.scale.width - 500, 50, `Dominoes left: ${this.dominoCount}`, {
-            fontSize: "48px",
+        this.dominoCountText = this.add.text(this.scale.width - 120, -800, `Dominoes left: ${this.dominoCount}`, {
+            fontSize: "87px",
             color: "#ffffff",
             align: "center"
         }).setOrigin(0);
 
-        this.timeText = this.add.text(this.scale.width - 500, 120, `Time: 0.00s`, {
-            fontSize: "48px",
+        this.timeText = this.add.text(this.scale.width + 50, -700, `Time: 0.00s`, {
+            fontSize: "87px",
             color: "#ffffff",
             align: "center"
          }).setOrigin(0);
