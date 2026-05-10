@@ -30,8 +30,7 @@ Experience requirements:
 - **Some objects are themselves animated**: unsatisfied (describe two examples)
     - Objects can swap states to reflect player changes, ie the beef cooking, or a plate being taken
 
-Asset sources:
-- For each image/audio/video asset used, describe how it was created. What tool did you use to create it? Was it based on another work? If so, how did you change it, and where can we learn more about the original work for comparison?
+- Asset sources:
     - All image assets (sprites, cursors, etc) made by me without reference
         - made in Pixelorma: https://pixelorama.org
     - Audio:
