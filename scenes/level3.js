@@ -1,4 +1,5 @@
-export default class level3 extends Phaser.Scene {
+import dominoScene from "/scenes/dominoScene.js";
+export default class level3 extends dominoScene {
     constructor() {
         super("level3");
     }
@@ -13,38 +14,18 @@ export default class level3 extends Phaser.Scene {
         this.load.image("button", "assets/button.png");
     }
 
-    create() {
+    sceneSpecificCreate() {
         this.cameras.main.setZoom(0.55);
         this.cameras.main.setScroll(0, -440);
         this.dominoCount = 11;
-        this.dominoes = [];
-        this.ground = [];
-        this.knockdownStarted = false;
-        this.cheated = false;
-        this.won = false;
 
-        const groundTexture = this.textures.get("ground");
-        const groundWidth = groundTexture.getSourceImage().width;
-        const groundHeight = groundTexture.getSourceImage().height;
-        let groundTileCount = this.scale.width / (groundWidth * 10);
-
-        for (let i = 0; i < groundTileCount; i++) {
-            let tile = this.matter.add.image(
-                i * groundWidth * 10 + (groundWidth * 10) / 2,
-                this.scale.height - (groundHeight * 10) / 2,
-                "ground"
-            )
-            .setScale(10)
-            .setStatic(true);
-            this.ground.push(tile);
-        }
         for (let i = 0; i < 10; i++) {
-            let tile = this.matter.add.image(groundWidth * 5 + (groundWidth * 10 * i), 210, "stone")
+            let tile = this.matter.add.image(this.groundWidth * 5 + (this.groundWidth * 10 * i), 210, "stone")
                 .setScale(10)
                 .setStatic(true);
             this.ground.push(tile);
         }
-        let tile = this.matter.add.image(groundWidth * 5 + (groundWidth * 100) + (groundWidth * 5), 210, "stone")
+        let tile = this.matter.add.image(this.groundWidth * 5 + (this.groundWidth * 100) + (this.groundWidth * 5), 210, "stone")
                 .setScale(10)
                 .setStatic(true);
             this.ground.push(tile);
@@ -144,6 +125,8 @@ export default class level3 extends Phaser.Scene {
         this.dominoes.push(this.endDomino);
 
         this.startDomino.on('pointerdown', () => {
+            if (this.knockdownStarted) return;
+
             this.startTime = this.time.now;
             this.startDomino.setAngularVelocity(.04);
             this.tweens.add({

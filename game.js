@@ -3,6 +3,7 @@ import score from '/scenes/score.js';
 import level2 from '/scenes/level2.js';
 import level3 from '/scenes/level3.js';
 import startScene from '/scenes/startScene.js';
+import dominoScene from '/scenes/dominoScene.js';
 
 let config = {
     scale: {

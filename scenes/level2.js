@@ -1,44 +1,15 @@
-export default class level2 extends Phaser.Scene {
+import dominoScene from "/scenes/dominoScene.js";
+export default class level2 extends dominoScene {
     constructor() {
         super("level2");
     }
 
-    preload() {
-        this.load.image("ground", "assets/dirt.png");
-        this.load.image("stone", "assets/stone.png");
-        this.load.image("domino", "assets/domino.png");
-        this.load.image("startDomino", "assets/start_domino.png");
-        this.load.image("endDomino", "assets/end_domino.png");
-        this.load.image("arrow", "assets/arrow_small.png");
-        this.load.image("button", "assets/button.png");
-    }
-
-    create() {
+    sceneSpecificCreate() {
         this.dominoCount = 5;
-        this.dominoes = [];
-        this.ground = [];
-        this.knockdownStarted = false;
-        this.cheated = false;
-        this.won = false;
 
-        const groundTexture = this.textures.get("ground");
-        const groundWidth = groundTexture.getSourceImage().width;
-        const groundHeight = groundTexture.getSourceImage().height;
-        let groundTileCount = this.scale.width / (groundWidth * 10);
-
-        for (let i = 0; i < groundTileCount; i++) {
-            let tile = this.matter.add.image(
-                i * groundWidth * 10 + (groundWidth * 10) / 2,
-                this.scale.height - (groundHeight * 10) / 2,
-                "ground"
-            )
-            .setScale(10)
-            .setStatic(true);
-            this.ground.push(tile);
-        }
         for (let j = 0; j < 3; j++) {
             for (let i = 0; i < (10 - 4 * j); i++) {
-                let tile = this.matter.add.image(1920 - (j * 2 * groundWidth * 10) - (i * groundWidth * 10) - (groundWidth * 5), this.scale.height - (groundHeight * 5) - (groundHeight * 10) - (150 * j), "stone")
+                let tile = this.matter.add.image(1920 - (j * 2 * this.groundWidth * 10) - (i * this.groundWidth * 10) - (this.groundWidth * 5), this.scale.height - (this.groundWidth * 5) - (this.groundWidth * 10) - (150 * j), "stone")
                     .setScale(10)
                     .setStatic(true);
                 this.ground.push(tile);
@@ -140,6 +111,8 @@ export default class level2 extends Phaser.Scene {
         this.dominoes.push(this.endDomino);
 
         this.startDomino.on('pointerdown', () => {
+            if (this.knockdownStarted) return;
+
             this.startTime = this.time.now;
             this.startDomino.setAngularVelocity(.04);
             this.tweens.add({

@@ -1,42 +1,12 @@
-export default class tutorial extends Phaser.Scene {
+import dominoScene from '/scenes/dominoScene.js';
+
+export default class tutorial extends dominoScene {
     constructor() {
         super("tutorial");
     }
 
-    preload() {
-        this.load.image("ground", "assets/dirt.png");
-        this.load.image("domino", "assets/domino.png");
-        this.load.image("startDomino", "assets/start_domino.png");
-        this.load.image("endDomino", "assets/end_domino.png");
-        this.load.image("arrow", "assets/arrow_small.png");
-        this.load.image("button", "assets/button.png");
-    }
-
-    create() {
-        this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor("#687967");
-
+    sceneSpecificCreate() {
         this.dominoCount = 5;
-        this.dominoes = [];
-        this.ground = [];
-        this.knockdownStarted = false;
-        this.cheated = false;
-        this.won = false;
-
-        const groundTexture = this.textures.get("ground");
-        const groundWidth = groundTexture.getSourceImage().width;
-        const groundHeight = groundTexture.getSourceImage().height;
-        let groundTileCount = this.scale.width / (groundWidth * 10);
-
-        for (let i = 0; i < groundTileCount; i++) {
-            let tile = this.matter.add.image(
-                i * groundWidth * 10 + (groundWidth * 10) / 2,
-                this.scale.height - (groundHeight * 10) / 2,
-                "ground"
-            )
-            .setScale(10)
-            .setStatic(true);
-            this.ground.push(tile);
-        }
 
         const startTexture = this.textures.get("startDomino").getSourceImage();
         this.startDomino = this.matter.add.image(100, this.scale.height - 500, "startDomino")
@@ -129,6 +99,8 @@ export default class tutorial extends Phaser.Scene {
         });
 
         this.startDomino.on('pointerdown', () => {
+            if (this.knockdownStarted) return;
+
             this.startTime = this.time.now;
             this.startDomino.setAngularVelocity(.04);
             this.tweens.add({
