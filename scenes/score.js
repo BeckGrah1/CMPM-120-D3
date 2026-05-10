@@ -14,7 +14,6 @@ export default class score extends Phaser.Scene {
     }
 
     create() {
-        
         let congratulationsText = this.add.text(this.scale.width / 2, 200, "You completed the level!", {
             fontFamily: "Pixelify Sans",
             fontSize: "80px",
@@ -96,7 +95,20 @@ export default class score extends Phaser.Scene {
                         window.location.reload();
                     }
                     else {
-                        this.scene.start(this.nextLevel);
+                        const bgm = this.sound.get("bgm");
+                        const vol = { value: bgm.volume };
+                        this.tweens.add({
+                            targets: vol,
+                            value: 1,
+                            duration: 1000,
+                            ease: "Sine.easeInOut",
+                            onUpdate: () => {
+                                bgm.setVolume(vol.value);
+                            },
+                            onComplete: () => {
+                                this.scene.start(this.nextLevel);
+                            }
+                        });
                     }
                 }
             });

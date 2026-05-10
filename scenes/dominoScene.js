@@ -11,6 +11,7 @@ export default class dominoScene extends Phaser.Scene {
         this.load.image("endDomino",   "assets/end_domino.png");
         this.load.image("arrow",       "assets/arrow_small.png");
         this.load.image("button",      "assets/button.png");
+        this.load.audio("winSound", "assets/audio/win_sound.mp3");
     }
 
     create() {

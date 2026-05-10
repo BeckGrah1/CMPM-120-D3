@@ -168,6 +168,21 @@ export default class level3 extends dominoScene {
                     duration: 500,
                     ease: "Sine.easeInOut",
                     onComplete: () => {
+                        const bgm = this.sound.get("bgm");
+                        const vol = { value: bgm.volume };
+                        this.tweens.add({
+                            targets: vol,
+                            value: .5,
+                            duration: 1000,
+                            ease: "Sine.easeInOut",
+                            onUpdate: () => {
+                                bgm.setVolume(vol.value);
+                            },
+                            onComplete: () => {
+                                let winSound = this.sound.add("winSound");
+                                winSound.play();
+                            }
+                        });
                         this.time.delayedCall(3000, () => {
                             this.cameras.main.fadeOut(1000, 0, 0, 0);
                             this.time.delayedCall(1000, () => {

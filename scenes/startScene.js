@@ -5,6 +5,7 @@ export default class startScene extends Phaser.Scene {
 
     preload() {
         this.load.image("button", "assets/button.png");
+        this.load.audio("bgm", "assets/audio/bgm.mp3");
     }
 
     create() {
@@ -78,6 +79,9 @@ export default class startScene extends Phaser.Scene {
                 duration: 500,
                 ease: "Sine.easeInOut",
                 onComplete: () => {
+                    let music = this.sound.add("bgm");
+                    music.setLoop(true);
+                    music.play();
                     this.scene.start("tutorial");
                 }
             });
