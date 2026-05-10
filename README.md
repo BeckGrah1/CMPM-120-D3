@@ -1,6 +1,6 @@
 You can play the game at: 
 
-Requirements:
+**Requirements:
     - Player inputs:
         * different player inputs include clicking to place dominoes, interacting with the start domino to knock it over, and interacting with menu buttons
     - 3+ physics based gameplay scenes:
@@ -9,7 +9,7 @@ Requirements:
     - Other scenes:
         * game also includes a start scene, and a scene between levels that shows player stats for the previous level
 
-Assets:
+**Assets:
     - Images:
         - all asset images made by me in [pixelorama](https://pixelorama.org)
     - Audio:
