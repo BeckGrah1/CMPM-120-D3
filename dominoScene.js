@@ -15,6 +15,7 @@ export default class dominoScene extends Phaser.Scene {
     }
 
     create() {
+        this.previewDomino = null;
         this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor("#687967");
         this.ground = [];
         this.dominoes = [];

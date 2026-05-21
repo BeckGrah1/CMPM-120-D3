@@ -15,6 +15,7 @@ export default class level3 extends dominoScene {
     }
 
     sceneSpecificCreate() {
+        this.hoveringButton = false;
         this.cameras.main.setZoom(0.55);
         this.cameras.main.setScroll(0, -440);
         this.dominoCount = 11;
@@ -32,8 +33,22 @@ export default class level3 extends dominoScene {
 
         this.placeStartDominos();
 
-        this.input.on('pointerdown', (pointer) => {
+        this.input.on('pointermove', (pointer) => {
             if (this.dominoCount > 0 && (!this.knockdownStarted || this.cheated)) {
+                const dominoTexture = this.textures.get("domino");
+                const dominoWidth = dominoTexture.getSourceImage().width * 10;
+                const dominoHeight = dominoTexture.getSourceImage().height * 10;
+
+                if (this.previewDomino == null) {
+                    this.previewDomino = this.add.image(pointer.worldX, pointer.worldY, "domino").setScale(10).setAlpha(0.5);
+                } else {
+                    this.previewDomino.setPosition(pointer.worldX, pointer.worldY);
+                }
+            }
+        });
+
+        this.input.on('pointerup', (pointer) => {
+            if (this.dominoCount > 0 && (!this.knockdownStarted || this.cheated) && !this.hoveringButton) {
                 const dominoTexture = this.textures.get("domino");
                 const dominoWidth = dominoTexture.getSourceImage().width * 10;
                 const dominoHeight = dominoTexture.getSourceImage().height * 10;
@@ -41,7 +56,7 @@ export default class level3 extends dominoScene {
                 let canPlaceDomino = true;
                 this.dominoes.forEach((domino) => {
                     if (Phaser.Geom.Intersects.RectangleToRectangle(
-                        new Phaser.Geom.Rectangle(pointer.worldX, pointer.worldY, dominoWidth, dominoHeight),
+                        new Phaser.Geom.Rectangle(pointer.worldX - dominoWidth / 2, pointer.worldY - dominoHeight / 2, dominoWidth, dominoHeight),
                         domino.getBounds()
                     )) {
                         canPlaceDomino = false;
@@ -49,7 +64,7 @@ export default class level3 extends dominoScene {
                 });
                 this.ground.forEach((tile) => {
                     if (Phaser.Geom.Intersects.RectangleToRectangle(
-                        new Phaser.Geom.Rectangle(pointer.worldX, pointer.worldY, dominoWidth, dominoHeight),
+                        new Phaser.Geom.Rectangle(pointer.worldX - dominoWidth / 2, pointer.worldY - dominoHeight / 2, dominoWidth, dominoHeight),
                         tile.getBounds()
                     )) {
                         canPlaceDomino = false;
@@ -58,17 +73,22 @@ export default class level3 extends dominoScene {
 
                 if (!canPlaceDomino) {
                     this.cameras.main.shake(100, 0.005);
+                    this.previewDomino.destroy();
+                    this.previewDomino = null;
                     return;
                 };
 
                 this.dominoCount--;
-                let domino = this.matter.add.image(pointer.worldX + dominoWidth / 2, pointer.worldY + dominoHeight / 2, "domino")
+                let domino = this.matter.add.image(pointer.worldX, pointer.worldY, "domino")
                     .setScale(10)
                     .setFrictionAir(0.01)
                     .setBounce(0.05)
                 domino.setMass(0.1);
                 this.dominoes.push(domino);
                 this.dominoCountText.setText(`Dominoes left: ${this.dominoCount}`);
+
+                this.previewDomino.destroy();
+                this.previewDomino = null;
             }
         });
     }
@@ -126,7 +146,8 @@ export default class level3 extends dominoScene {
 
         this.startDomino.on('pointerdown', () => {
             if (this.knockdownStarted) return;
-
+            this.previewDomino?.destroy();
+            
             this.startTime = this.time.now;
             this.startDomino.setAngularVelocity(.04);
             this.tweens.add({
@@ -229,6 +250,7 @@ export default class level3 extends dominoScene {
         }).setOrigin(0.5);
 
         restartButton.on('pointerover', () => {
+            this.hoveringButton = true;
             this.tweens.add({
                 targets: restartButton,
                 scale: 3.96,
@@ -238,6 +260,7 @@ export default class level3 extends dominoScene {
         });
 
         restartButton.on('pointerout', () => {
+            this.hoveringButton = false;
             this.tweens.add({
                 targets: restartButton,
                 scale: 3.6,
