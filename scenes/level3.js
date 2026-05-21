@@ -1,4 +1,4 @@
-import dominoScene from "/scenes/dominoScene.js";
+import dominoScene from '../dominoScene.js';
 export default class level3 extends dominoScene {
     constructor() {
         super("level3");

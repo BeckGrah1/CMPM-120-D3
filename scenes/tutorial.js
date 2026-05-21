@@ -1,4 +1,4 @@
-import dominoScene from '/scenes/dominoScene.js';
+import dominoScene from '../dominoScene.js';
 
 export default class tutorial extends dominoScene {
     constructor() {
