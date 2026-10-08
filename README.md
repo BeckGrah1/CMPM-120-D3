@@ -1,4 +1,4 @@
-You can play the game at: [https://beckgrah.itch.io/domino-physics-game](url)
+You can play the game at: [https://beckgrah.itch.io/domino-physics-game](https://beckgrah.itch.io/domino-physics-game)
 
 This project contains a simple physics based domino game made in Phaser 4. Your goal is to knock down the red domino starting with the green one. The player clicks to place dominos, and starts the chain by clicking on the green domino.
 
